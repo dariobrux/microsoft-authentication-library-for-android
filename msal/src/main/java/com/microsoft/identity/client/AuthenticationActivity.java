@@ -32,6 +32,9 @@ import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
+import android.util.Log;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CountDownLatch;
@@ -148,8 +151,8 @@ public final class AuthenticationActivity extends Activity {
                 new CustomTabsIntent.Builder(mCustomTabsServiceConnection.getCustomTabsSession()) : new CustomTabsIntent.Builder();
 
         // Create the Intent used to launch the Url
-        mCustomTabsIntent = builder.setShowTitle(true).build();
-        mCustomTabsIntent.intent.setPackage(mChromePackageWithCustomTabSupport);
+//        mCustomTabsIntent = builder.setShowTitle(true).build();
+//        mCustomTabsIntent.intent.setPackage(mChromePackageWithCustomTabSupport);
     }
 
     private static class MsalCustomTabsServiceConnection extends CustomTabsServiceConnection {
@@ -204,12 +207,11 @@ public final class AuthenticationActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Logger.info(TAG, null, "onNewIntent is called, received redirect from system webview.");
-        final String url = intent.getStringExtra(Constants.CUSTOM_TAB_REDIRECT);
 
+        final String url = intent.getStringExtra(Constants.CUSTOM_TAB_REDIRECT);
         final Intent resultIntent = new Intent();
         resultIntent.putExtra(Constants.AUTHORIZATION_FINAL_URL, url);
-        returnToCaller(Constants.UIResponse.AUTH_CODE_COMPLETE,
-                resultIntent);
+        returnToCaller(Constants.UIResponse.AUTH_CODE_COMPLETE, resultIntent);
     }
 
     @Override
@@ -226,16 +228,39 @@ public final class AuthenticationActivity extends Activity {
         mRequestUrl =  this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
 
         Logger.infoPII(TAG, null, "Request to launch is: " + mRequestUrl);
-        if (mChromePackageWithCustomTabSupport != null) {
-            Logger.info(TAG, null, "ChromeCustomTab support is available, launching chrome tab.");
-            mCustomTabsIntent.launchUrl(this, Uri.parse(mRequestUrl));
-        } else {
-            Logger.info(TAG, null, "Chrome tab support is not available, launching chrome browser.");
-            final Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mRequestUrl));
-            browserIntent.setPackage(MsalUtils.getChromePackage(this.getApplicationContext()));
-            browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
-            this.startActivity(browserIntent);
-        }
+//        if (mChromePackageWithCustomTabSupport != null) {
+//            Logger.info(TAG, null, "ChromeCustomTab support is available, launching chrome tab.");
+//            mCustomTabsIntent.launchUrl(this, Uri.parse(mRequestUrl));
+//        } else {
+//            Logger.info(TAG, null, "Chrome tab support is not available, launching chrome browser.");
+//            final Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mRequestUrl));
+//            browserIntent.setPackage(MsalUtils.getChromePackage(this.getApplicationContext()));
+//            browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+//            this.startActivity(browserIntent);
+//        }
+//
+        final WebView webView = new WebView(this);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.loadUrl(mRequestUrl);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url)
+            {
+                Log.e(TAG, "onPageFinished: " + url);
+                if (url.startsWith("msal"))
+                {
+                    final Intent intent = new Intent(getApplicationContext(), BrowserTabActivity.class);
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    intent.setDataAndNormalize(Uri.parse(url));
+                    startActivity(intent);
+                }
+            }
+        });
+        setContentView(webView);
+
+
     }
 
     @Override
