@@ -244,30 +244,30 @@ final class MsalUtils {
         return null;
     }
 
-    /**
-     * CHROME_PACKAGE array contains all the chrome packages that is currently available on play store, we will only support
-     * chrome stable.
-     *
-     * @param context The app context that is used to check the chrome packages.
-     * @return The chrome package name that exists on the device.
-     */
-    static String getChromePackage(final Context context) {
-        final PackageManager packageManager = context.getPackageManager();
-        if (packageManager == null) {
-            return null;
-        }
-
-        String installedChromePackage = null;
-        try {
-            packageManager.getPackageInfo(CHROME_PACKAGE, PackageManager.GET_ACTIVITIES);
-            installedChromePackage = CHROME_PACKAGE;
-        } catch (final PackageManager.NameNotFoundException e) {
-            // swallow this exception. If the package is not existed, the exception will be thrown.
-            Logger.error(TAG, null, "Failed to retrieve chrome package info.", e);
-        }
-
-        return installedChromePackage;
-    }
+//    /**
+//     * CHROME_PACKAGE array contains all the chrome packages that is currently available on play store, we will only support
+//     * chrome stable.
+//     *
+//     * @param context The app context that is used to check the chrome packages.
+//     * @return The chrome package name that exists on the device.
+//     */
+//    static String getChromePackage(final Context context) {
+//        final PackageManager packageManager = context.getPackageManager();
+//        if (packageManager == null) {
+//            return null;
+//        }
+//
+//        String installedChromePackage = null;
+//        try {
+//            packageManager.getPackageInfo(CHROME_PACKAGE, PackageManager.GET_ACTIVITIES);
+//            installedChromePackage = CHROME_PACKAGE;
+//        } catch (final PackageManager.NameNotFoundException e) {
+//            // swallow this exception. If the package is not existed, the exception will be thrown.
+//            Logger.error(TAG, null, "Failed to retrieve chrome package info.", e);
+//        }
+//
+//        return installedChromePackage;
+//    }
 
     /**
      * Decode the given url, and convert it into map with the given delimiter.

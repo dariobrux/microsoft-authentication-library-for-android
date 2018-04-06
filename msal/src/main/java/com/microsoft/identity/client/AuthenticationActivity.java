@@ -32,7 +32,8 @@ import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
-import android.util.Log;
+import android.text.TextUtils;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -48,7 +49,8 @@ import java.util.concurrent.TimeUnit;
  * AuthenticationActivity will be responsible for checking if it's safe to launch chrome custom tab, if not, will
  * go with chrome browser, if chrome is not installed, we throw error back.
  */
-public final class AuthenticationActivity extends Activity {
+public final class AuthenticationActivity extends Activity
+{
 
     private static final String TAG = AuthenticationActivity.class.getSimpleName(); //NOPMD
     private static final long CUSTOMTABS_MAX_CONNECTION_TIMEOUT = 1L;
@@ -63,13 +65,15 @@ public final class AuthenticationActivity extends Activity {
     private String mTelemetryRequestId;
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         mChromePackageWithCustomTabSupport = MsalUtils.getChromePackageWithCustomTabSupport(getApplicationContext());
 
         // If activity is killed by the os, savedInstance will be the saved bundle.
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
+        {
             Logger.verbose(TAG, null, "AuthenticationActivity is re-created after killed by the os.");
             mRestarted = true;
             mTelemetryRequestId = savedInstanceState.getString(Constants.TELEMETRY_REQUEST_ID);
@@ -78,25 +82,27 @@ public final class AuthenticationActivity extends Activity {
         }
 
         final Intent data = getIntent();
-        if (data == null) {
+        if (data == null)
+        {
             sendError(MsalClientException.UNRESOLVABLE_INTENT, "Received null data intent from caller");
             return;
         }
 
         mRequestUrl = data.getStringExtra(Constants.REQUEST_URL_KEY);
         mRequestId = data.getIntExtra(Constants.REQUEST_ID, 0);
-        if (MsalUtils.isEmpty(mRequestUrl)) {
+        if (MsalUtils.isEmpty(mRequestUrl))
+        {
             sendError(MsalClientException.UNRESOLVABLE_INTENT, "Request url is not set on the intent");
             return;
         }
 
-        // We'll use custom tab if the chrome installed on the device comes with custom tab support(on 45 and above it
-        // does). If the chrome package doesn't contain the support, we'll use chrome to launch the UI.
-        if (MsalUtils.getChromePackage(this.getApplicationContext()) == null) {
-            Logger.info(TAG, null, "Chrome is not installed on the device, cannot continue with auth.");
-            sendError(MsalClientException.CHROME_NOT_INSTALLED, "Chrome is not installed on the device, cannot proceed with auth");
-            return;
-        }
+//        // We'll use custom tab if the chrome installed on the device comes with custom tab support(on 45 and above it
+//        // does). If the chrome package doesn't contain the support, we'll use chrome to launch the UI.
+//        if (MsalUtils.getChromePackage(this.getApplicationContext()) == null) {
+//            Logger.info(TAG, null, "Chrome is not installed on the device, cannot continue with auth.");
+//            sendError(MsalClientException.CHROME_NOT_INSTALLED, "Chrome is not installed on the device, cannot proceed with auth");
+//            return;
+//        }
 
         mTelemetryRequestId = data.getStringExtra(Constants.TELEMETRY_REQUEST_ID);
         mUiEventBuilder = new UiEvent.Builder();
@@ -104,22 +110,27 @@ public final class AuthenticationActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
-        if (mChromePackageWithCustomTabSupport != null) {
+        if (mChromePackageWithCustomTabSupport != null)
+        {
             warmUpCustomTabs();
         }
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         super.onStop();
-        if (mCustomTabsServiceConnection.getCustomTabsServiceIsBound()) {
+        if (mCustomTabsServiceConnection != null && mCustomTabsServiceConnection.getCustomTabsServiceIsBound())
+        {
             unbindService(mCustomTabsServiceConnection);
         }
     }
 
-    private void warmUpCustomTabs() {
+    private void warmUpCustomTabs()
+    {
         final CountDownLatch latch = new CountDownLatch(1);
         mCustomTabsServiceConnection = new MsalCustomTabsServiceConnection(latch);
 
@@ -131,18 +142,22 @@ public final class AuthenticationActivity extends Activity {
         );
 
         boolean initCustomTabsWithSession = true;
-        try {
+        try
+        {
             // await returns true if count is 0, false if action times out
             // invert this boolean to indicate if we should skip warming up
             boolean timedOut = !latch.await(CUSTOMTABS_MAX_CONNECTION_TIMEOUT, TimeUnit.SECONDS);
-            if (timedOut) {
+            if (timedOut)
+            {
                 // if the request timed out, we don't actually know whether or not the service connected.
                 // to be safe, we'll skip warmup and rely on mCustomTabsServiceIsBound
                 // to unbind the Service when onStop() is called.
                 initCustomTabsWithSession = false;
                 Logger.warning(TAG, null, "Connection to CustomTabs timed out. Skipping warmup.");
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Logger.error(TAG, null, "Failed to connect to CustomTabs. Skipping warmup.", e);
             initCustomTabsWithSession = false;
         }
@@ -155,19 +170,22 @@ public final class AuthenticationActivity extends Activity {
 //        mCustomTabsIntent.intent.setPackage(mChromePackageWithCustomTabSupport);
     }
 
-    private static class MsalCustomTabsServiceConnection extends CustomTabsServiceConnection {
+    private static class MsalCustomTabsServiceConnection extends CustomTabsServiceConnection
+    {
 
         private final WeakReference<CountDownLatch> mLatchWeakReference;
         private CustomTabsClient mCustomTabsClient;
         private CustomTabsSession mCustomTabsSession;
         private boolean mCustomTabsServiceIsBound;
 
-        MsalCustomTabsServiceConnection(final CountDownLatch latch) {
+        MsalCustomTabsServiceConnection(final CountDownLatch latch)
+        {
             mLatchWeakReference = new WeakReference<>(latch);
         }
 
         @Override
-        public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
+        public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client)
+        {
             final CountDownLatch latch = mLatchWeakReference.get();
 
             mCustomTabsServiceIsBound = true;
@@ -175,25 +193,30 @@ public final class AuthenticationActivity extends Activity {
             mCustomTabsClient.warmup(0L);
             mCustomTabsSession = mCustomTabsClient.newSession(null);
 
-            if (null != latch) {
+            if (null != latch)
+            {
                 latch.countDown();
             }
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName componentName) {
+        public void onServiceDisconnected(ComponentName componentName)
+        {
             mCustomTabsServiceIsBound = false;
         }
 
         /**
          * Gets the {@link CustomTabsSession} associated to this CustomTabs connection.
+         *
          * @return the session.
          */
-        CustomTabsSession getCustomTabsSession() {
+        CustomTabsSession getCustomTabsSession()
+        {
             return mCustomTabsSession;
         }
 
-        boolean getCustomTabsServiceIsBound() {
+        boolean getCustomTabsServiceIsBound()
+        {
             return mCustomTabsServiceIsBound;
         }
     }
@@ -204,7 +227,8 @@ public final class AuthenticationActivity extends Activity {
      * @param intent
      */
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(Intent intent)
+    {
         super.onNewIntent(intent);
         Logger.info(TAG, null, "onNewIntent is called, received redirect from system webview.");
 
@@ -215,17 +239,19 @@ public final class AuthenticationActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
-        if (mRestarted) {
+        if (mRestarted)
+        {
             cancelRequest();
             return;
         }
 
         mRestarted = true;
 
-        mRequestUrl =  this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
+        mRequestUrl = this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
 
         Logger.infoPII(TAG, null, "Request to launch is: " + mRequestUrl);
 //        if (mChromePackageWithCustomTabSupport != null) {
@@ -242,12 +268,18 @@ public final class AuthenticationActivity extends Activity {
         final WebView webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(mRequestUrl);
-        webView.setWebViewClient(new WebViewClient() {
+        webView.setWebViewClient(new WebViewClient()
+        {
             @Override
-            public void onPageFinished(WebView view, String url)
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request)
             {
-                Log.e(TAG, "onPageFinished: " + url);
-                if (url.startsWith("msal"))
+                if (request == null)
+                {
+                    return true;
+                }
+
+                String url = request.getUrl().toString();
+                if (!TextUtils.isEmpty(url) && url.startsWith("msal"))
                 {
                     final Intent intent = new Intent(getApplicationContext(), BrowserTabActivity.class);
                     intent.setAction(Intent.ACTION_VIEW);
@@ -255,7 +287,9 @@ public final class AuthenticationActivity extends Activity {
                     intent.addCategory(Intent.CATEGORY_BROWSABLE);
                     intent.setDataAndNormalize(Uri.parse(url));
                     startActivity(intent);
+                    return true;
                 }
+                return false;
             }
         });
         setContentView(webView);
@@ -264,7 +298,8 @@ public final class AuthenticationActivity extends Activity {
     }
 
     @Override
-    protected void onSaveInstanceState(final Bundle outState) {
+    protected void onSaveInstanceState(final Bundle outState)
+    {
         super.onSaveInstanceState(outState);
 
         outState.putString(Constants.REQUEST_URL_KEY, mRequestUrl);
@@ -274,7 +309,8 @@ public final class AuthenticationActivity extends Activity {
     /**
      * Cancels the auth request.
      */
-    void cancelRequest() {
+    void cancelRequest()
+    {
         Logger.verbose(TAG, null, "Cancel the authentication request.");
         mUiEventBuilder.setUserDidCancel();
         returnToCaller(Constants.UIResponse.CANCEL, new Intent());
@@ -286,11 +322,13 @@ public final class AuthenticationActivity extends Activity {
      * @param resultCode The result code to return back.
      * @param data       {@link Intent} contains the detailed result.
      */
-    private void returnToCaller(final int resultCode, final Intent data) {
+    private void returnToCaller(final int resultCode, final Intent data)
+    {
         Logger.info(TAG, null, "Return to caller with resultCode: " + resultCode + "; requestId: " + mRequestId);
         data.putExtra(Constants.REQUEST_ID, mRequestId);
 
-        if (null != mUiEventBuilder) {
+        if (null != mUiEventBuilder)
+        {
             Telemetry.getInstance().stopEvent(mTelemetryRequestId, mUiEventBuilder);
         }
 
@@ -304,7 +342,8 @@ public final class AuthenticationActivity extends Activity {
      * @param errorCode        The error code to send back.
      * @param errorDescription The error description to send back.
      */
-    private void sendError(final String errorCode, final String errorDescription) {
+    private void sendError(final String errorCode, final String errorDescription)
+    {
         Logger.info(TAG, null, "Sending error back to the caller, errorCode: " + errorCode + "; errorDescription"
                 + errorDescription);
         final Intent errorIntent = new Intent();
