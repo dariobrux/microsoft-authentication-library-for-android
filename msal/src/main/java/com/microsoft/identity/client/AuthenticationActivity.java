@@ -23,9 +23,13 @@
 
 package com.microsoft.identity.client;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsClient;
@@ -33,7 +37,7 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
 import android.text.TextUtils;
-import android.webkit.WebResourceRequest;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -267,18 +271,12 @@ public final class AuthenticationActivity extends Activity
 //
         final WebView webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(mRequestUrl);
         webView.setWebViewClient(new WebViewClient()
         {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request)
+            public void onPageStarted(WebView view, String url, Bitmap favicon)
             {
-                if (request == null)
-                {
-                    return true;
-                }
-
-                String url = request.getUrl().toString();
+                view.setVisibility(View.INVISIBLE);
                 if (!TextUtils.isEmpty(url) && url.startsWith("msal"))
                 {
                     final Intent intent = new Intent(getApplicationContext(), BrowserTabActivity.class);
@@ -287,11 +285,53 @@ public final class AuthenticationActivity extends Activity
                     intent.addCategory(Intent.CATEGORY_BROWSABLE);
                     intent.setDataAndNormalize(Uri.parse(url));
                     startActivity(intent);
-                    return true;
                 }
-                return false;
+                else
+                {
+                    super.onPageStarted(view, url, favicon);
+                }
             }
+
+            @Override
+            public void onPageFinished(final WebView view, String url)
+            {
+                super.onPageFinished(view, url);
+                ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+                animator.setDuration(2000);
+                animator.addListener(new AnimatorListenerAdapter()
+                {
+                    @Override
+                    public void onAnimationEnd(Animator animation)
+                    {
+                        view.setVisibility(View.VISIBLE);
+                    }
+                });
+                animator.start();
+            }
+
+            //            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request)
+//            {
+//                if (request == null)
+//                {
+//                    return true;
+//                }
+//
+//                String url = request.getUrl().toString();
+//                if (!TextUtils.isEmpty(url) && url.startsWith("msal"))
+//                {
+//                    final Intent intent = new Intent(getApplicationContext(), BrowserTabActivity.class);
+//                    intent.setAction(Intent.ACTION_VIEW);
+//                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+//                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//                    intent.setDataAndNormalize(Uri.parse(url));
+//                    startActivity(intent);
+//                    return true;
+//                }
+//                return false;
+//            }
         });
+        webView.loadUrl(mRequestUrl);
         setContentView(webView);
 
 
