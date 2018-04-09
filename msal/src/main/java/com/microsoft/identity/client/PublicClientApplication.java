@@ -565,6 +565,17 @@ public final class PublicClientApplication {
         return mTokenCache;
     }
 
+    /**
+     * Get the refresh token.
+     * @return the refresh token.
+     */
+    public String getRefreshToken()
+    {
+        if (mTokenCache == null)
+            return null;
+        return mTokenCache.getRefreshToken();
+    }
+
     private void loadMetaDataFromManifest() {
         final ApplicationInfo applicationInfo = MsalUtils.getApplicationInfo(mAppContext);
         if (applicationInfo == null || applicationInfo.metaData == null) {

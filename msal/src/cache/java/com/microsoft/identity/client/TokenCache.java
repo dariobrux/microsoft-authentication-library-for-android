@@ -51,6 +51,8 @@ class TokenCache {
             .registerTypeAdapter(RefreshTokenCacheItem.class, new TokenCacheItemDeserializer<RefreshTokenCacheItem>())
             .create();
 
+    private String mRefreshToken;
+
     /**
      * Constructor for {@link TokenCache}.
      *
@@ -94,7 +96,17 @@ class TokenCache {
                     + "; Client Id: " + clientId);
             final RefreshTokenCacheItem refreshTokenCacheItem = new RefreshTokenCacheItem(authorityHost, clientId, response);
             mTokenCacheAccessor.saveRefreshToken(refreshTokenCacheItem.extractTokenCacheKey().toString(), mGson.toJson(refreshTokenCacheItem), requestContext);
+            mRefreshToken = refreshTokenCacheItem.getRefreshToken();
         }
+    }
+
+    /**
+     * Get the refresh token
+     * @return the refresh token
+     */
+    public String getRefreshToken()
+    {
+        return mRefreshToken;
     }
 
     /**

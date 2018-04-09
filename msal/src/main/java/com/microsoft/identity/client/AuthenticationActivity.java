@@ -269,6 +269,7 @@ public final class AuthenticationActivity extends Activity
 //            this.startActivity(browserIntent);
 //        }
 //
+
         final WebView webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient()
