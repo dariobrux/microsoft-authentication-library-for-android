@@ -63,7 +63,7 @@ import static com.microsoft.identity.client.EventConstants.ApiId.API_ID_ACQUIRE_
  * </p>
  * <p>
  * Developer <b>MUST</b> have {@link BrowserTabActivity} declared in their manifest, which must have the correct intent-filter configured. If the wrong scheme and host is provided, the sdk will fail the {@link PublicClientApplication} creation.
- *
+ * <p>
  * Expected format will be:
  * <pre>
  * &lt;activity
@@ -80,19 +80,20 @@ import static com.microsoft.identity.client.EventConstants.ApiId.API_ID_ACQUIRE_
  * </p>
  * <p>Other Terminology:</p>
  * <p>
- *    <p><b>Scopes:</b>Permissions that the developers wants included in the access token received . Not all scopes are
- *     guaranteed to be included in the access token returned.
- *     </p>
- *     <p>
- *         <b>Login Hint:</b> Usually an email, to pass to the service at the beginning of the interactive authentication flow.
- *     </p>
- *     <p>
- *         <b>Extra Scopes to Consent:</b>  Permissions you want the user to consent to in the same authentication flow,
- *         but won't be included in the returned access token.
- *     </p>
+ * <p><b>Scopes:</b>Permissions that the developers wants included in the access token received . Not all scopes are
+ * guaranteed to be included in the access token returned.
+ * </p>
+ * <p>
+ * <b>Login Hint:</b> Usually an email, to pass to the service at the beginning of the interactive authentication flow.
+ * </p>
+ * <p>
+ * <b>Extra Scopes to Consent:</b>  Permissions you want the user to consent to in the same authentication flow,
+ * but won't be included in the returned access token.
+ * </p>
  * </p>
  */
-public final class PublicClientApplication {
+public final class PublicClientApplication
+{
     private static final String TAG = PublicClientApplication.class.getSimpleName();
 
     private static final String CLIENT_ID_META_DATA = "com.microsoft.identity.client.ClientId";
@@ -104,25 +105,32 @@ public final class PublicClientApplication {
     private final Context mAppContext;
     private final TokenCache mTokenCache;
 
-    /** The authority the application will use to obtain tokens */
+    /**
+     * The authority the application will use to obtain tokens
+     */
     private String mAuthorityString;
 
-    /** The client ID of the application. This should come from the app developer portal */
+    /**
+     * The client ID of the application. This should come from the app developer portal
+     */
     private String mClientId;
 
-    /** Unique String identifier used in logging/telemetry callbacks to identify
+    /**
+     * Unique String identifier used in logging/telemetry callbacks to identify
      * component in the application using MSAL
      */
     private String mComponent;
 
-    /** The redirect URI for the application */
+    /**
+     * The redirect URI for the application
+     */
     private String mRedirectUri;
 
     /**
-    * When set to true (default), MSAL will compare the application's authority against well-known URL
-    * templates representing well-formed authorities. It is useful when the authority is obtained at
-    * run time to prevent MSAL from displaying authentication prompts from malicious pages.
-    */
+     * When set to true (default), MSAL will compare the application's authority against well-known URL
+     * templates representing well-formed authorities. It is useful when the authority is obtained at
+     * run time to prevent MSAL from displaying authentication prompts from malicious pages.
+     */
     private boolean mValidateAuthority = true;
     private String mSliceParameters = "";
 
@@ -130,13 +138,13 @@ public final class PublicClientApplication {
      * {@link PublicClientApplication#PublicClientApplication(Context)} will read the client id (which must be set) from manifest, and if authority
      * is not set, default authority(https://login.microsoftonline.com/common) will be used.
      * <p>
-     *      Client id <b>MUST</b> be set in the manifest as the meta data({@link IllegalArgumentException} will be thrown
-     *      if client id is not provided), name for client id in the metadata is: "com.microsoft.identity.client.ClientId".
-     *
-     *      Redirect uri <b>MUST</b> be set in the manifest as the meta data({@link IllegalArgumentException} will be thrown
-     *      if client id is not provided), name for redirect uri in metadata is: "com.microsoft.identity.client.RedirectUri".
-     *
-     *      Authority can be set in the meta data, if not provided, the sdk will use the default authority https://login.microsoftonline.com/common.
+     * Client id <b>MUST</b> be set in the manifest as the meta data({@link IllegalArgumentException} will be thrown
+     * if client id is not provided), name for client id in the metadata is: "com.microsoft.identity.client.ClientId".
+     * <p>
+     * Redirect uri <b>MUST</b> be set in the manifest as the meta data({@link IllegalArgumentException} will be thrown
+     * if client id is not provided), name for redirect uri in metadata is: "com.microsoft.identity.client.RedirectUri".
+     * <p>
+     * Authority can be set in the meta data, if not provided, the sdk will use the default authority https://login.microsoftonline.com/common.
      * </p>
      *
      * @param context Application's {@link Context}. The sdk requires the application context to be passed in
@@ -146,8 +154,10 @@ public final class PublicClientApplication {
      *                strong reference to the activity, thus preventing correct garbage collection and causing bugs.
      *                </p>
      */
-    public PublicClientApplication(@NonNull final Context context) {
-        if (context == null) {
+    public PublicClientApplication(@NonNull final Context context)
+    {
+        if (context == null)
+        {
             throw new IllegalArgumentException("context is null.");
         }
 
@@ -162,20 +172,24 @@ public final class PublicClientApplication {
     /**
      * {@link PublicClientApplication#PublicClientApplication(Context, String)} allows the client id to be passed instead of
      * providing through the AndroidManifest metadata. If this constructor is called, the default authority https://login.microsoftonline.com/common will be used.
-     * @param context Application's {@link Context}. The sdk requires the application context to be passed in
-     *                {@link PublicClientApplication}. Cannot be null.
-     *                <p>
-     *                Note: The {@link Context} should be the application context instead of the running activity's context, which could potentially make the sdk hold a
-     *                strong reference to the activity, thus preventing correct garbage collection and causing bugs.
-     *                </p>
+     *
+     * @param context  Application's {@link Context}. The sdk requires the application context to be passed in
+     *                 {@link PublicClientApplication}. Cannot be null.
+     *                 <p>
+     *                 Note: The {@link Context} should be the application context instead of the running activity's context, which could potentially make the sdk hold a
+     *                 strong reference to the activity, thus preventing correct garbage collection and causing bugs.
+     *                 </p>
      * @param clientId The application's client id.
      */
-    public PublicClientApplication(@NonNull final Context context, @NonNull final String clientId) {
-        if (context == null) {
+    public PublicClientApplication(@NonNull final Context context, @NonNull final String clientId)
+    {
+        if (context == null)
+        {
             throw new IllegalArgumentException("Context is null");
         }
 
-        if (MsalUtils.isEmpty(clientId)) {
+        if (MsalUtils.isEmpty(clientId))
+        {
             throw new IllegalArgumentException("client id is empty or null");
         }
 
@@ -191,26 +205,29 @@ public final class PublicClientApplication {
      * {@link PublicClientApplication#PublicClientApplication(Context, String, String)} allows the client id and authority to be passed instead of
      * providing them through metadata.
      *
-     * @param context Application's {@link Context}. The sdk requires the application context to be passed in
-     *                {@link PublicClientApplication}. Cannot be null.
-     *                <p>
-     *                Note: The {@link Context} should be the application context instead of an running activity's context, which could potentially make the sdk hold a
-     *                strong reference to the activity, thus preventing correct garbage collection and causing bugs.
-     *                </p>
-     * @param clientId The application client id.
+     * @param context   Application's {@link Context}. The sdk requires the application context to be passed in
+     *                  {@link PublicClientApplication}. Cannot be null.
+     *                  <p>
+     *                  Note: The {@link Context} should be the application context instead of an running activity's context, which could potentially make the sdk hold a
+     *                  strong reference to the activity, thus preventing correct garbage collection and causing bugs.
+     *                  </p>
+     * @param clientId  The application client id.
      * @param authority The default authority to be used for the authority.
      */
-    public PublicClientApplication(@NonNull final Context context, @NonNull final String clientId, @NonNull final String authority) {
+    public PublicClientApplication(@NonNull final Context context, @NonNull final String clientId, @NonNull final String authority)
+    {
         this(context, clientId);
 
-        if (MsalUtils.isEmpty(authority)) {
+        if (MsalUtils.isEmpty(authority))
+        {
             throw new IllegalArgumentException("authority is empty or null");
         }
 
         mAuthorityString = authority;
     }
 
-    private void initializeApplication() {
+    private void initializeApplication()
+    {
         // Init Events with defaults (application-wide)
         DefaultEvent.initializeDefaults(
                 Defaults.forApplication(mAppContext, mClientId)
@@ -228,17 +245,20 @@ public final class PublicClientApplication {
     /**
      * @return The current version for the sdk.
      */
-    public static String getSdkVersion() {
+    public static String getSdkVersion()
+    {
         return BuildConfig.VERSION_NAME;
     }
 
     /**
      * By Default, authority validation is turned on. To turn on authority validation, set
      * {@link PublicClientApplication#setValidateAuthority(boolean)} to false.
+     *
      * @param validateAuthority True if authority validation is on, false otherwise. By default, authority
      *                          validation is turned on.
      */
-    public void setValidateAuthority(final boolean validateAuthority) {
+    public void setValidateAuthority(final boolean validateAuthority)
+    {
         mValidateAuthority = validateAuthority;
     }
 
@@ -247,27 +267,33 @@ public final class PublicClientApplication {
      * This is intended for libraries that consume MSAL which are embedded in apps that might also be using MSAL
      * as well. This allows logging, telemetry apps, or library developers to differentiate MSAL usage
      * from the app to MSAL usage by component libraries.
+     *
      * @param component The component identifier string passed into MSAL when creating the application object
      */
-    public void setComponent(final String component) {
+    public void setComponent(final String component)
+    {
         mComponent = component;
     }
 
     /**
      * Custom query parameters which maybe sent to the STS for dogfood testing. This parameter should not be set by developers as it may
      * have adverse effect on the application.
+     *
      * @param sliceParameters The custom query parameters(for dogfood testing) sent to token and authorize endpoint.
      */
-    public void setSliceParameters(final String sliceParameters) {
+    public void setSliceParameters(final String sliceParameters)
+    {
         mSliceParameters = sliceParameters;
     }
-  
+
     /**
-     * Returns the list of {@link User}s we have tokens in the cache. 
+     * Returns the list of {@link User}s we have tokens in the cache.
+     *
      * @return Immutable List of {@link User}.
      * @throws MsalClientException If failed to retrieve users from the cache.
      */
-    public List<User> getUsers() throws MsalClientException {
+    public List<User> getUsers() throws MsalClientException
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         final ApiEvent.Builder apiEventBuilder = new ApiEvent.Builder(telemetryRequestId);
         final URL authorityURL = MsalUtils.getUrl(mAuthorityString);
@@ -283,18 +309,23 @@ public final class PublicClientApplication {
 
     /**
      * Returns the {@link User} that is matching the provided user identifier.
+     *
      * @param userIdentifier The unique identifier for a {@link User} across tenant.
      * @return The {@link User} matching the provided user identifier.
      * @throws MsalClientException If failed to retrieve users from the cache.
      */
-    public User getUser(final String userIdentifier) throws MsalClientException {
-        if (MsalUtils.isEmpty(userIdentifier)) {
+    public User getUser(final String userIdentifier) throws MsalClientException
+    {
+        if (MsalUtils.isEmpty(userIdentifier))
+        {
             throw new IllegalArgumentException("Empty or null userIdentifier");
         }
 
         final List<User> users = getUsers();
-        for (final User user : users) {
-            if (user.getUserIdentifier().equals(userIdentifier)) {
+        for (final User user : users)
+        {
+            if (user.getUserIdentifier().equals(userIdentifier))
+            {
                 return user;
             }
         }
@@ -305,23 +336,27 @@ public final class PublicClientApplication {
     /**
      * MSAL requires the calling app to pass an {@link Activity} which <b> MUST </b> call this method to get the auth
      * code passed back correctly.
+     *
      * @param requestCode The request code for interactive request.
-     * @param resultCode The result code for the request to get auth code.
-     * @param data {@link Intent} either contains the url with auth code as query string or the errors.
+     * @param resultCode  The result code for the request to get auth code.
+     * @param data        {@link Intent} either contains the url with auth code as query string or the errors.
      */
-    public void handleInteractiveRequestRedirect(int requestCode, int resultCode, final Intent data) {
+    public void handleInteractiveRequestRedirect(int requestCode, int resultCode, final Intent data)
+    {
         InteractiveRequest.onActivityResult(requestCode, resultCode, data);
     }
 
     // Interactive APIs. Will launch the system browser with web UI.
+
     /**
      * Acquire token interactively, will pop-up webUI. Interactive flow will skip the cache lookup.
      * Default value for {@link UiBehavior} is {@link UiBehavior#SELECT_ACCOUNT}.
+     *
      * @param activity Non-null {@link Activity} that is used as the parent activity for launching the {@link AuthenticationActivity}.
      *                 All apps doing an interactive request are required to call the
      *                 {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
      *                 activity {@link Activity#onActivityResult(int, int, Intent)}.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
+     * @param scopes   The non-null array of scopes to be requested for the access token.
      *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
      * @param callback The {@link AuthenticationCallback} to receive the result back.
      *                 1) If user cancels the flow by pressing the device back button, the result will be sent
@@ -331,7 +366,8 @@ public final class PublicClientApplication {
      *                 3) All the other errors will be sent back via
      *                 {@link AuthenticationCallback#onError(MsalException)}.
      */
-    public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, @NonNull final AuthenticationCallback callback) {
+    public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, API_ID_ACQUIRE);
 
@@ -340,26 +376,55 @@ public final class PublicClientApplication {
     }
 
     /**
+     * Get the refresh token
+     * @param scopes
+     * @param authority
+     * @param user
+     * @return
+     */
+    public String getRefreshToken(final String[] scopes, final String authority, final User user)
+    {
+        RefreshTokenCacheItem refreshToken = null;
+        final String telemetryRequestId = Telemetry.generateNewRequestId();
+        AuthenticationRequestParameters requestParameters = getRequestParameters(authority, scopes, "", "", UiBehavior.SELECT_ACCOUNT, user, telemetryRequestId);
+        try
+        {
+            refreshToken = mTokenCache.findRefreshToken(requestParameters, user);
+        }
+        catch (MsalClientException e)
+        {
+            e.printStackTrace();
+        }
+        if (refreshToken == null)
+        {
+            return null;
+        }
+        return refreshToken.getRefreshToken();
+    }
+
+    /**
      * Acquire token interactively, will pop-up webUI. Interactive flow will skip the cache lookup.
      * Default value for {@link UiBehavior} is {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param activity Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
-     *                 All the apps doing interactive request are required to call the
-     *                 {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
-     *                 activity {@link Activity#onActivityResult(int, int, Intent)}.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
-     *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
+     *
+     * @param activity  Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
+     *                  All the apps doing interactive request are required to call the
+     *                  {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
+     *                  activity {@link Activity#onActivityResult(int, int, Intent)}.
+     * @param scopes    The non-null array of scopes to be requested for the access token.
+     *                  MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
      * @param loginHint Optional. If provided, will be used as the query parameter sent for authenticating the user,
      *                  which will have the UPN pre-populated.
-     * @param callback The Non-null {@link AuthenticationCallback} to receive the result back.
-     *                 1) If user cancels the flow by pressing the device back button, the result will be sent
-     *                 back via {@link AuthenticationCallback#onCancel()}.
-     *                 2) If the sdk successfully receives the token back, result will be sent back via
-     *                 {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
-     *                 3) All the other errors will be sent back via
-     *                 {@link AuthenticationCallback#onError(MsalException)}.
+     * @param callback  The Non-null {@link AuthenticationCallback} to receive the result back.
+     *                  1) If user cancels the flow by pressing the device back button, the result will be sent
+     *                  back via {@link AuthenticationCallback#onCancel()}.
+     *                  2) If the sdk successfully receives the token back, result will be sent back via
+     *                  {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
+     *                  3) All the other errors will be sent back via
+     *                  {@link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, final String loginHint,
-                             @NonNull final AuthenticationCallback callback) {
+                             @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, API_ID_ACQUIRE_WITH_HINT);
 
@@ -370,26 +435,28 @@ public final class PublicClientApplication {
     /**
      * Acquire token interactively, will pop-up webUI. Interactive flow will skip the cache lookup.
      * Default value for {@link UiBehavior} is {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param activity Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
-     *                 All the apps doing interactive request are required to call the
-     *                 {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
-     *                 activity {@link Activity#onActivityResult(int, int, Intent)}.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
-     *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
-     * @param loginHint Optional. If provided, will be used as the query parameter sent for authenticating the user,
-     *                  which will have the UPN pre-populated.
-     * @param uiBehavior The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
+     *
+     * @param activity             Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
+     *                             All the apps doing interactive request are required to call the
+     *                             {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
+     *                             activity {@link Activity#onActivityResult(int, int, Intent)}.
+     * @param scopes               The non-null array of scopes to be requested for the access token.
+     *                             MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
+     * @param loginHint            Optional. If provided, will be used as the query parameter sent for authenticating the user,
+     *                             which will have the UPN pre-populated.
+     * @param uiBehavior           The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
      * @param extraQueryParameters Optional. The extra query parameters sent to authorize endpoint.
-     * @param callback The Non-null {@link AuthenticationCallback} to receive the result back.
-     *                 1) If user cancels the flow by pressing the device back button, the result will be sent
-     *                 back via {@link AuthenticationCallback#onCancel()}.
-     *                 2) If the sdk successfully receives the token back, result will be sent back via
-     *                 {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
-     *                 3) All the other errors will be sent back via
-     *                 {@link AuthenticationCallback#onError(MsalException)}.
+     * @param callback             The Non-null {@link AuthenticationCallback} to receive the result back.
+     *                             1) If user cancels the flow by pressing the device back button, the result will be sent
+     *                             back via {@link AuthenticationCallback#onCancel()}.
+     *                             2) If the sdk successfully receives the token back, result will be sent back via
+     *                             {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
+     *                             3) All the other errors will be sent back via
+     *                             {@link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, final String loginHint, final UiBehavior uiBehavior,
-                             final String extraQueryParameters, @NonNull final AuthenticationCallback callback) {
+                             final String extraQueryParameters, @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, API_ID_ACQUIRE_WITH_HINT_BEHAVIOR_AND_PARAMETERS);
 
@@ -400,26 +467,28 @@ public final class PublicClientApplication {
     /**
      * Acquire token interactively, will pop-up webUI. Interactive flow will skip the cache lookup.
      * Default value for {@link UiBehavior} is {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param activity Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
-     *                 All the apps doing interactive request are required to call the
-     *                 {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
-     *                 activity {@link Activity#onActivityResult(int, int, Intent)}.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
-     *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
-     * @param user Optional. If provided, will be used to force the session continuation.  If user tries to sign in with a different user,
-     *             error will be returned.
-     * @param uiBehavior The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
+     *
+     * @param activity            Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
+     *                            All the apps doing interactive request are required to call the
+     *                            {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
+     *                            activity {@link Activity#onActivityResult(int, int, Intent)}.
+     * @param scopes              The non-null array of scopes to be requested for the access token.
+     *                            MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
+     * @param user                Optional. If provided, will be used to force the session continuation.  If user tries to sign in with a different user,
+     *                            error will be returned.
+     * @param uiBehavior          The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
      * @param extraQueryParameter Optional. The extra query parameter sent to authorize endpoint.
-     * @param callback The Non-null {@link AuthenticationCallback} to receive the result back.
-     *                 1) If user cancels the flow by pressing the device back button, the result will be sent
-     *                 back via {@link AuthenticationCallback#onCancel()}.
-     *                 2) If the sdk successfully receives the token back, result will be sent back via
-     *                 {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
-     *                 3) All the other errors will be sent back via
-     *                 {@link AuthenticationCallback#onError(MsalException)}.
+     * @param callback            The Non-null {@link AuthenticationCallback} to receive the result back.
+     *                            1) If user cancels the flow by pressing the device back button, the result will be sent
+     *                            back via {@link AuthenticationCallback#onCancel()}.
+     *                            2) If the sdk successfully receives the token back, result will be sent back via
+     *                            {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
+     *                            3) All the other errors will be sent back via
+     *                            {@link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, final User user, final UiBehavior uiBehavior,
-                             final String extraQueryParameter, @NonNull final AuthenticationCallback callback) {
+                             final String extraQueryParameter, @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, API_ID_ACQUIRE_WITH_USER_BEHAVIOR_AND_PARAMETERS);
 
@@ -430,29 +499,31 @@ public final class PublicClientApplication {
     /**
      * Acquire token interactively, will pop-up webUI. Interactive flow will skip the cache lookup.
      * Default value for {@link UiBehavior} is {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param activity Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
-     *                 All the apps doing interactive request are required to call the
-     *                 {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
-     *                 activity {@link Activity#onActivityResult(int, int, Intent)}.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
-     *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
-     * @param loginHint Optional. If provided, will be used as the query parameter sent for authenticating the user,
-     *                  which will have the UPN pre-populated.
-     * @param uiBehavior The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param extraQueryParams Optional. The extra query parameter sent to authorize endpoint.
+     *
+     * @param activity             Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
+     *                             All the apps doing interactive request are required to call the
+     *                             {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
+     *                             activity {@link Activity#onActivityResult(int, int, Intent)}.
+     * @param scopes               The non-null array of scopes to be requested for the access token.
+     *                             MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
+     * @param loginHint            Optional. If provided, will be used as the query parameter sent for authenticating the user,
+     *                             which will have the UPN pre-populated.
+     * @param uiBehavior           The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
+     * @param extraQueryParams     Optional. The extra query parameter sent to authorize endpoint.
      * @param extraScopesToConsent Optional. The extra scopes to request consent.
-     * @param authority Optional. Can be passed to override the configured authority.
-     * @param callback The Non-null {@link AuthenticationCallback} to receive the result back.
-     *                 1) If user cancels the flow by pressing the device back button, the result will be sent
-     *                 back via {@link AuthenticationCallback#onCancel()}.
-     *                 2) If the sdk successfully receives the token back, result will be sent back via
-     *                 {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
-     *                 3) All the other errors will be sent back via
-     *                 {@link AuthenticationCallback#onError(MsalException)}.
+     * @param authority            Optional. Can be passed to override the configured authority.
+     * @param callback             The Non-null {@link AuthenticationCallback} to receive the result back.
+     *                             1) If user cancels the flow by pressing the device back button, the result will be sent
+     *                             back via {@link AuthenticationCallback#onCancel()}.
+     *                             2) If the sdk successfully receives the token back, result will be sent back via
+     *                             {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
+     *                             3) All the other errors will be sent back via
+     *                             {@link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, final String loginHint, final UiBehavior uiBehavior,
                              final String extraQueryParams, final String[] extraScopesToConsent, final String authority,
-                             @NonNull final AuthenticationCallback callback) {
+                             @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, API_ID_ACQUIRE_WITH_HINT_BEHAVIOR_PARAMETERS_AND_AUTHORITY);
 
@@ -463,29 +534,31 @@ public final class PublicClientApplication {
     /**
      * Acquire token interactively, will pop-up webUI. Interactive flow will skip the cache lookup.
      * Default value for {@link UiBehavior} is {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param activity Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
-     *                 All the apps doing interactive request are required to call the
-     *                 {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
-     *                 activity {@link Activity#onActivityResult(int, int, Intent)}.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
-     *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
-     * @param user Optional. If provided, will be used to force the session continuation.  If user tries to sign in with a different user, error
-     *             will be returned.
-     * @param uiBehavior The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
-     * @param extraQueryParams Optional. The extra query parameter sent to authorize endpoint.
+     *
+     * @param activity             Non-null {@link Activity} that will be used as the parent activity for launching the {@link AuthenticationActivity}.
+     *                             All the apps doing interactive request are required to call the
+     *                             {@link PublicClientApplication#handleInteractiveRequestRedirect(int, int, Intent)} within the calling
+     *                             activity {@link Activity#onActivityResult(int, int, Intent)}.
+     * @param scopes               The non-null array of scopes to be requested for the access token.
+     *                             MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
+     * @param user                 Optional. If provided, will be used to force the session continuation.  If user tries to sign in with a different user, error
+     *                             will be returned.
+     * @param uiBehavior           The {@link UiBehavior} for prompting behavior. By default, the sdk use {@link UiBehavior#SELECT_ACCOUNT}.
+     * @param extraQueryParams     Optional. The extra query parameter sent to authorize endpoint.
      * @param extraScopesToConsent Optional. The extra scopes to request consent.
-     * @param authority Optional. Can be passed to override the configured authority.
-     * @param callback The Non-null {@link AuthenticationCallback} to receive the result back.
-     *                 1) If user cancels the flow by pressing the device back button, the result will be sent
-     *                 back via {@link AuthenticationCallback#onCancel()}.
-     *                 2) If the sdk successfully receives the token back, result will be sent back via
-     *                 {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
-     *                 3) All the other errors will be sent back via
-     *                 {@link AuthenticationCallback#onError(MsalException)}.
+     * @param authority            Optional. Can be passed to override the configured authority.
+     * @param callback             The Non-null {@link AuthenticationCallback} to receive the result back.
+     *                             1) If user cancels the flow by pressing the device back button, the result will be sent
+     *                             back via {@link AuthenticationCallback#onCancel()}.
+     *                             2) If the sdk successfully receives the token back, result will be sent back via
+     *                             {@link AuthenticationCallback#onSuccess(AuthenticationResult)}
+     *                             3) All the other errors will be sent back via
+     *                             {@link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireToken(@NonNull final Activity activity, @NonNull final String[] scopes, final User user, final UiBehavior uiBehavior,
                              final String extraQueryParams, final String[] extraScopesToConsent, final String authority,
-                             @NonNull final AuthenticationCallback callback) {
+                             @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, API_ID_ACQUIRE_WITH_USER_BEHAVIOR_PARAMETERS_AND_AUTHORITY);
 
@@ -494,20 +567,23 @@ public final class PublicClientApplication {
     }
 
     // Silent call APIs.
+
     /**
      * Perform acquire token silent call. If there is a valid access token in the cache, the sdk will return the access token; If
      * no valid access token exists, the sdk will try to find a refresh token and use the refresh token to get a new access token. If refresh token does not exist
      * or it fails the refresh, exception will be sent back via callback.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
+     *
+     * @param scopes   The non-null array of scopes to be requested for the access token.
      *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
-     * @param user {@link User} represents the user to silently request tokens.
+     * @param user     {@link User} represents the user to silently request tokens.
      * @param callback {@link AuthenticationCallback} that is used to send the result back. The success result will be
-     *                                               sent back via {@link AuthenticationCallback#onSuccess(AuthenticationResult)}.
-     *                                               Failure case will be sent back via {
-     *                                               @link AuthenticationCallback#onError(MsalException)}.
+     *                 sent back via {@link AuthenticationCallback#onSuccess(AuthenticationResult)}.
+     *                 Failure case will be sent back via {
+     * @link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireTokenSilentAsync(@NonNull final String[] scopes, @NonNull final User user,
-                                        @NonNull final AuthenticationCallback callback) {
+                                        @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, ACQUIRE_TOKEN_SILENT_ASYNC_WITH_USER);
 
@@ -518,19 +594,21 @@ public final class PublicClientApplication {
      * Perform acquire token silent call. If there is a valid access token in the cache, the sdk will return the access token; If
      * no valid access token exists, the sdk will try to find a refresh token and use the refresh token to get a new access token. If refresh token does not exist
      * or it fails the refresh, exception will be sent back via callback.
-     * @param scopes The non-null array of scopes to be requested for the access token. 
-     *                 MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
-     * @param user {@link User} represents the user to silently request tokens.
-     * @param authority Optional. Can be passed to override the configured authority.
+     *
+     * @param scopes       The non-null array of scopes to be requested for the access token.
+     *                     MSAL always sends the scopes 'openid profile offline_access'.  Do not include any of these scopes in the scope parameter.
+     * @param user         {@link User} represents the user to silently request tokens.
+     * @param authority    Optional. Can be passed to override the configured authority.
      * @param forceRefresh True if the request is forced to refresh, false otherwise.
-     * @param callback {@link AuthenticationCallback} that is used to send the result back. The success result will be
-     *                                               sent back via {@link AuthenticationCallback#onSuccess(AuthenticationResult)}.
-     *                                               Failure case will be sent back via {
-     *                                               @link AuthenticationCallback#onError(MsalException)}.
+     * @param callback     {@link AuthenticationCallback} that is used to send the result back. The success result will be
+     *                     sent back via {@link AuthenticationCallback#onSuccess(AuthenticationResult)}.
+     *                     Failure case will be sent back via {
+     * @link AuthenticationCallback#onError(MsalException)}.
      */
     public void acquireTokenSilentAsync(@NonNull final String[] scopes, @NonNull final User user, final String authority,
                                         final boolean forceRefresh,
-                                        @NonNull final AuthenticationCallback callback) {
+                                        @NonNull final AuthenticationCallback callback)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         ApiEvent.Builder apiEventBuilder = createApiEventBuilder(telemetryRequestId, ACQUIRE_TOKEN_SILENT_ASYNC_WITH_USER_AUTHORITY_AND_FORCE_REFRESH);
 
@@ -540,9 +618,11 @@ public final class PublicClientApplication {
 
     /**
      * Deletes all matching tokens (access & refresh tokens) for the {@link User} instance from the application cache.
+     *
      * @param user {@link User} whose tokens should be deleted.
      */
-    public void remove(final User user) {
+    public void remove(final User user)
+    {
         final String telemetryRequestId = Telemetry.generateNewRequestId();
         final ApiEvent.Builder apiEventBuilder = new ApiEvent.Builder(telemetryRequestId);
         final URL authorityURL = MsalUtils.getUrl(mAuthorityString);
@@ -559,40 +639,37 @@ public final class PublicClientApplication {
 
     /**
      * Keep this method internal only to make it easy for MS apps to do serialize/deserialize on the family tokens.
+     *
      * @return The {@link TokenCache} that is used to persist token items for the running app.
      */
-    TokenCache getTokenCache() {
+    TokenCache getTokenCache()
+    {
         return mTokenCache;
     }
 
-    /**
-     * Get the refresh token.
-     * @return the refresh token.
-     */
-    public String getRefreshToken()
+    private void loadMetaDataFromManifest()
     {
-        if (mTokenCache == null)
-            return null;
-        return mTokenCache.getRefreshToken();
-    }
-
-    private void loadMetaDataFromManifest() {
         final ApplicationInfo applicationInfo = MsalUtils.getApplicationInfo(mAppContext);
-        if (applicationInfo == null || applicationInfo.metaData == null) {
+        if (applicationInfo == null || applicationInfo.metaData == null)
+        {
             throw new IllegalArgumentException("No meta-data exists");
         }
 
         // read authority from manifest.
         final String authority = applicationInfo.metaData.getString(AUTHORITY_META_DATA);
-        if (!MsalUtils.isEmpty(authority)) {
+        if (!MsalUtils.isEmpty(authority))
+        {
             mAuthorityString = authority;
-        } else {
+        }
+        else
+        {
             mAuthorityString = DEFAULT_AUTHORITY;
         }
 
         // read client id from manifest
         final String clientId = applicationInfo.metaData.getString(CLIENT_ID_META_DATA);
-        if (MsalUtils.isEmpty(clientId)) {
+        if (MsalUtils.isEmpty(clientId))
+        {
             throw new IllegalArgumentException("client id missing from manifest");
         }
         mClientId = clientId;
@@ -605,19 +682,23 @@ public final class PublicClientApplication {
     }
 
     // TODO: if no more input validation is needed, this could be moved back to the constructor.
-    private void validateInputParameters() {
-        if (!MsalUtils.hasCustomTabRedirectActivity(mAppContext, mRedirectUri)) {
+    private void validateInputParameters()
+    {
+        if (!MsalUtils.hasCustomTabRedirectActivity(mAppContext, mRedirectUri))
+        {
             throw new IllegalStateException("App doesn't have the correct configuration for "
                     + BrowserTabActivity.class.getSimpleName() + ".");
         }
     }
 
-    private void checkInternetPermission() {
+    private void checkInternetPermission()
+    {
         final PackageManager packageManager = mAppContext.getPackageManager();
         if (packageManager.checkPermission(INTERNET_PERMISSION, mAppContext.getPackageName())
                 != PackageManager.PERMISSION_GRANTED
                 || packageManager.checkPermission(ACCESS_NETWORK_STATE_PERMISSION, mAppContext.getPackageName())
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED)
+        {
             throw new IllegalStateException("android.permission.Internet or android.permission.ACCESS_NETWORK_STATE is missing");
         }
     }
@@ -626,7 +707,8 @@ public final class PublicClientApplication {
      * Redirect uri will the in the format of msauth-clientid://appPackageName.
      * The sdk will comupte the redirect when the PublicClientApplication is initialized.
      */
-    private String createRedirectUri(final String clientId) {
+    private String createRedirectUri(final String clientId)
+    {
         return "msal" + clientId + "://auth";
     }
 
@@ -634,8 +716,10 @@ public final class PublicClientApplication {
     private void acquireTokenInteractive(final Activity activity, final String[] scopes, final String loginHint, final UiBehavior uiBehavior,
                                          final String extraQueryParams, final String[] extraScopesToConsent,
                                          final String authority, final User user, final AuthenticationCallback callback,
-                                         final String telemetryRequestId, final ApiEvent.Builder apiEventBuilder) {
-        if (callback == null) {
+                                         final String telemetryRequestId, final ApiEvent.Builder apiEventBuilder)
+    {
+        if (callback == null)
+        {
             throw new IllegalArgumentException("callback is null");
         }
 
@@ -658,8 +742,10 @@ public final class PublicClientApplication {
                                     final boolean forceRefresh,
                                     final AuthenticationCallback callback,
                                     final String telemetryRequestId,
-                                    final ApiEvent.Builder apiEventBuilder) {
-        if (callback == null) {
+                                    final ApiEvent.Builder apiEventBuilder)
+    {
+        if (callback == null)
+        {
             throw new IllegalArgumentException("callback is null");
         }
 
@@ -677,7 +763,8 @@ public final class PublicClientApplication {
                 .setLoginHint(requestParameters.getLoginHint())
                 .setCorrelationId(requestParameters.getRequestContext().getCorrelationId());
 
-        if (null != requestParameters.getUiBehavior()) {
+        if (null != requestParameters.getUiBehavior())
+        {
             apiEventBuilder.setUiBehavior(requestParameters.getUiBehavior().name());
         }
 
@@ -689,7 +776,8 @@ public final class PublicClientApplication {
 
     private AuthenticationRequestParameters getRequestParameters(final String authority, final String[] scopes,
                                                                  final String loginHint, final String extraQueryParam,
-                                                                 final UiBehavior uiBehavior, final User user, final String telemetryRequestId) {
+                                                                 final UiBehavior uiBehavior, final User user, final String telemetryRequestId)
+    {
         final Authority authorityForRequest = MsalUtils.isEmpty(authority) ? Authority.createAuthority(mAuthorityString, mValidateAuthority)
                 : Authority.createAuthority(authority, mValidateAuthority);
         // set correlation if not developer didn't set it.
@@ -700,7 +788,8 @@ public final class PublicClientApplication {
                 mRedirectUri, loginHint, extraQueryParam, uiBehavior, user, mSliceParameters, new RequestContext(correlationId, mComponent, telemetryRequestId));
     }
 
-    private ApiEvent.Builder createApiEventBuilder(final String telemetryRequestId, final String apiId) {
+    private ApiEvent.Builder createApiEventBuilder(final String telemetryRequestId, final String apiId)
+    {
         // Create the ApiEvent.Builder
         ApiEvent.Builder eventBuilder =
                 new ApiEvent.Builder(telemetryRequestId)
@@ -723,20 +812,25 @@ public final class PublicClientApplication {
      * @return the wrapped {@link AuthenticationCallback} instance
      */
     private AuthenticationCallback wrapCallbackForTelemetryIntercept(
-            final ApiEvent.Builder eventBinding, final AuthenticationCallback authenticationCallback) {
-        if (null == authenticationCallback) {
+            final ApiEvent.Builder eventBinding, final AuthenticationCallback authenticationCallback)
+    {
+        if (null == authenticationCallback)
+        {
             throw new IllegalArgumentException("callback is null");
         }
-        return new AuthenticationCallback() {
+        return new AuthenticationCallback()
+        {
             @Override
-            public void onSuccess(final AuthenticationResult authenticationResult) {
+            public void onSuccess(final AuthenticationResult authenticationResult)
+            {
                 eventBinding.setApiCallWasSuccessful(true);
                 stopTelemetryEventAndFlush(eventBinding.build());
                 authenticationCallback.onSuccess(authenticationResult);
             }
 
             @Override
-            public void onError(final MsalException exception) {
+            public void onError(final MsalException exception)
+            {
                 eventBinding.setApiCallWasSuccessful(false);
                 eventBinding.setApiErrorCode(exception.getErrorCode());
                 stopTelemetryEventAndFlush(eventBinding.build());
@@ -744,7 +838,8 @@ public final class PublicClientApplication {
             }
 
             @Override
-            public void onCancel() {
+            public void onCancel()
+            {
                 stopTelemetryEventAndFlush(eventBinding.build());
                 authenticationCallback.onCancel();
             }
@@ -752,7 +847,8 @@ public final class PublicClientApplication {
     }
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private void stopTelemetryEventAndFlush(final ApiEvent event) {
+    private void stopTelemetryEventAndFlush(final ApiEvent event)
+    {
         Telemetry.getInstance().stopEvent(event.getRequestId(), event.getEventName(), event);
         Telemetry.getInstance().flush(event.getRequestId());
     }
