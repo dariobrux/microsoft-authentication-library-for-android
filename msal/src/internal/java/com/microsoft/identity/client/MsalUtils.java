@@ -183,33 +183,34 @@ final class MsalUtils {
     }
 
     static boolean hasCustomTabRedirectActivity(final Context context, final String url) {
-        final PackageManager packageManager = context.getPackageManager();
-        if (packageManager == null) {
-            return false;
-        }
-
-        final Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.addCategory(Intent.CATEGORY_BROWSABLE);
-        intent.setDataAndNormalize(Uri.parse(url));
-        final List<ResolveInfo> resolveInfoList = packageManager.queryIntentActivities(intent,
-                PackageManager.GET_RESOLVED_FILTER);
-
-        // resolve info list will never be null, if no matching activities are found, empty list will be returned.
-        boolean hasActivity = false;
-        for (ResolveInfo info : resolveInfoList) {
-            ActivityInfo activityInfo = info.activityInfo;
-            if (activityInfo.name.equals(BrowserTabActivity.class.getName())) {
-                hasActivity = true;
-            } else {
-                // another application is listening for this url scheme, don't open
-                // Custom Tab for security reasons
-                return false;
-            }
-        }
-
-        return hasActivity;
+        return true;
+//        final PackageManager packageManager = context.getPackageManager();
+//        if (packageManager == null) {
+//            return false;
+//        }
+//
+//        final Intent intent = new Intent();
+//        intent.setAction(Intent.ACTION_VIEW);
+//        intent.addCategory(Intent.CATEGORY_DEFAULT);
+//        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//        intent.setDataAndNormalize(Uri.parse(url));
+//        final List<ResolveInfo> resolveInfoList = packageManager.queryIntentActivities(intent,
+//                PackageManager.GET_RESOLVED_FILTER);
+//
+//        // resolve info list will never be null, if no matching activities are found, empty list will be returned.
+//        boolean hasActivity = false;
+//        for (ResolveInfo info : resolveInfoList) {
+//            ActivityInfo activityInfo = info.activityInfo;
+//            if (activityInfo.name.equals(BrowserTabActivity.class.getName())) {
+//                hasActivity = true;
+//            } else {
+//                // another application is listening for this url scheme, don't open
+//                // Custom Tab for security reasons
+//                return false;
+//            }
+//        }
+//
+//        return hasActivity;
     }
 
     /**
