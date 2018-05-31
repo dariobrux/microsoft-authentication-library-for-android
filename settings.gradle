@@ -1,7 +1,2 @@
 include ':msal'
 include ':pillosampleapp'
-
-// test apps
-include ':testapps:sample'
-include ':testapps:testapp'
-include ':testapps:automationapp'
