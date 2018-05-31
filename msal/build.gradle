@@ -6,7 +6,7 @@ apply plugin: 'pmd'
 apply plugin: 'com.github.dcendents.android-maven'
 
 def packageName = 'com.pillohealth'
-def libVersion = "1.0.0"
+def libVersion = "1.0.1"
 
 static def getTimestamp() {
     def currentDate = new Date()
@@ -126,7 +126,6 @@ task sourcesJar(type: Jar) {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:customtabs:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.2'
 
     // test dependencies

@@ -32,10 +32,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsClient;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.customtabs.CustomTabsServiceConnection;
-import android.support.customtabs.CustomTabsSession;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
@@ -62,9 +58,6 @@ public final class AuthenticationActivity extends Activity
     private String mRequestUrl;
     private int mRequestId;
     private boolean mRestarted;
-    private String mChromePackageWithCustomTabSupport;
-    private CustomTabsIntent mCustomTabsIntent;
-    private MsalCustomTabsServiceConnection mCustomTabsServiceConnection;
     private UiEvent.Builder mUiEventBuilder;
     private String mTelemetryRequestId;
 
@@ -72,8 +65,6 @@ public final class AuthenticationActivity extends Activity
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        mChromePackageWithCustomTabSupport = MsalUtils.getChromePackageWithCustomTabSupport(getApplicationContext());
 
         // If activity is killed by the os, savedInstance will be the saved bundle.
         if (savedInstanceState != null)
@@ -113,118 +104,6 @@ public final class AuthenticationActivity extends Activity
         Telemetry.getInstance().startEvent(mTelemetryRequestId, mUiEventBuilder.getEventName());
     }
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        if (mChromePackageWithCustomTabSupport != null)
-        {
-            warmUpCustomTabs();
-        }
-    }
-
-    @Override
-    protected void onStop()
-    {
-        super.onStop();
-        if (mCustomTabsServiceConnection != null && mCustomTabsServiceConnection.getCustomTabsServiceIsBound())
-        {
-            unbindService(mCustomTabsServiceConnection);
-        }
-    }
-
-    private void warmUpCustomTabs()
-    {
-        final CountDownLatch latch = new CountDownLatch(1);
-        mCustomTabsServiceConnection = new MsalCustomTabsServiceConnection(latch);
-
-        // Initiate the service-bind action
-        CustomTabsClient.bindCustomTabsService(
-                this,
-                mChromePackageWithCustomTabSupport,
-                mCustomTabsServiceConnection
-        );
-
-        boolean initCustomTabsWithSession = true;
-        try
-        {
-            // await returns true if count is 0, false if action times out
-            // invert this boolean to indicate if we should skip warming up
-            boolean timedOut = !latch.await(CUSTOMTABS_MAX_CONNECTION_TIMEOUT, TimeUnit.SECONDS);
-            if (timedOut)
-            {
-                // if the request timed out, we don't actually know whether or not the service connected.
-                // to be safe, we'll skip warmup and rely on mCustomTabsServiceIsBound
-                // to unbind the Service when onStop() is called.
-                initCustomTabsWithSession = false;
-                Logger.warning(TAG, null, "Connection to CustomTabs timed out. Skipping warmup.");
-            }
-        }
-        catch (InterruptedException e)
-        {
-            Logger.error(TAG, null, "Failed to connect to CustomTabs. Skipping warmup.", e);
-            initCustomTabsWithSession = false;
-        }
-
-        final CustomTabsIntent.Builder builder = initCustomTabsWithSession ?
-                new CustomTabsIntent.Builder(mCustomTabsServiceConnection.getCustomTabsSession()) : new CustomTabsIntent.Builder();
-
-        // Create the Intent used to launch the Url
-//        mCustomTabsIntent = builder.setShowTitle(true).build();
-//        mCustomTabsIntent.intent.setPackage(mChromePackageWithCustomTabSupport);
-    }
-
-    private static class MsalCustomTabsServiceConnection extends CustomTabsServiceConnection
-    {
-
-        private final WeakReference<CountDownLatch> mLatchWeakReference;
-        private CustomTabsClient mCustomTabsClient;
-        private CustomTabsSession mCustomTabsSession;
-        private boolean mCustomTabsServiceIsBound;
-
-        MsalCustomTabsServiceConnection(final CountDownLatch latch)
-        {
-            mLatchWeakReference = new WeakReference<>(latch);
-        }
-
-        @Override
-        public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client)
-        {
-            final CountDownLatch latch = mLatchWeakReference.get();
-
-            mCustomTabsServiceIsBound = true;
-            mCustomTabsClient = client;
-            mCustomTabsClient.warmup(0L);
-            mCustomTabsSession = mCustomTabsClient.newSession(null);
-
-            if (null != latch)
-            {
-                latch.countDown();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName)
-        {
-            mCustomTabsServiceIsBound = false;
-        }
-
-        /**
-         * Gets the {@link CustomTabsSession} associated to this CustomTabs connection.
-         *
-         * @return the session.
-         */
-        CustomTabsSession getCustomTabsSession()
-        {
-            return mCustomTabsSession;
-        }
-
-        boolean getCustomTabsServiceIsBound()
-        {
-            return mCustomTabsServiceIsBound;
-        }
-    }
-
     /**
      * OnNewIntent will be called before onResume.
      *
@@ -258,17 +137,6 @@ public final class AuthenticationActivity extends Activity
         mRequestUrl = this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
 
         Logger.infoPII(TAG, null, "Request to launch is: " + mRequestUrl);
-//        if (mChromePackageWithCustomTabSupport != null) {
-//            Logger.info(TAG, null, "ChromeCustomTab support is available, launching chrome tab.");
-//            mCustomTabsIntent.launchUrl(this, Uri.parse(mRequestUrl));
-//        } else {
-//            Logger.info(TAG, null, "Chrome tab support is not available, launching chrome browser.");
-//            final Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mRequestUrl));
-//            browserIntent.setPackage(MsalUtils.getChromePackage(this.getApplicationContext()));
-//            browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
-//            this.startActivity(browserIntent);
-//        }
-//
 
         final WebView webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -310,27 +178,6 @@ public final class AuthenticationActivity extends Activity
                 animator.start();
             }
 
-            //            @Override
-//            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request)
-//            {
-//                if (request == null)
-//                {
-//                    return true;
-//                }
-//
-//                String url = request.getUrl().toString();
-//                if (!TextUtils.isEmpty(url) && url.startsWith("msal"))
-//                {
-//                    final Intent intent = new Intent(getApplicationContext(), BrowserTabActivity.class);
-//                    intent.setAction(Intent.ACTION_VIEW);
-//                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-//                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-//                    intent.setDataAndNormalize(Uri.parse(url));
-//                    startActivity(intent);
-//                    return true;
-//                }
-//                return false;
-//            }
         });
         webView.loadUrl(mRequestUrl);
         setContentView(webView);
