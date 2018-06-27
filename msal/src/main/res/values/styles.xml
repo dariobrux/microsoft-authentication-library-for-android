@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ActivityBedtimeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/cone_bedtime</item>
+        <item name="colorPrimaryDark">@color/cone_bedtime</item>
+        <item name="colorAccent">@color/cone_bedtime</item>
+    </style>
+</resources>

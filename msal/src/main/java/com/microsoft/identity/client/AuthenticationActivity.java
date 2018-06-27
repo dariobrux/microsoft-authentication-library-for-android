@@ -23,23 +23,20 @@
 
 package com.microsoft.identity.client;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.lang.ref.WeakReference;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import com.microsoft.identity.msal.R;
 
 /**
  * Custom tab requires the device to have a browser with custom tab support, chrome with version >= 45 comes with the
@@ -51,6 +48,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class AuthenticationActivity extends Activity
 {
+    private WebView webView;
 
     private static final String TAG = AuthenticationActivity.class.getSimpleName(); //NOPMD
     private static final long CUSTOMTABS_MAX_CONNECTION_TIMEOUT = 1L;
@@ -61,10 +59,18 @@ public final class AuthenticationActivity extends Activity
     private UiEvent.Builder mUiEventBuilder;
     private String mTelemetryRequestId;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_authentication);
+
+        webView = findViewById(R.id.webView);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.setVisibility(View.INVISIBLE);
 
         // If activity is killed by the os, savedInstance will be the saved bundle.
         if (savedInstanceState != null)
@@ -138,8 +144,18 @@ public final class AuthenticationActivity extends Activity
 
         Logger.infoPII(TAG, null, "Request to launch is: " + mRequestUrl);
 
-        final WebView webView = new WebView(this);
-        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient()
+        {
+            public void onProgressChanged(WebView view, int progress)
+            {
+                if (progress == 100)
+                {
+                    webView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+
         webView.setWebViewClient(new WebViewClient()
         {
             @Override
@@ -162,27 +178,35 @@ public final class AuthenticationActivity extends Activity
             }
 
             @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url)
+            {
+                if (url.contains("access_denied"))
+                {
+                    finish();
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
             public void onPageFinished(final WebView view, String url)
             {
                 super.onPageFinished(view, url);
-                ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-                animator.setDuration(2000);
-                animator.addListener(new AnimatorListenerAdapter()
-                {
-                    @Override
-                    public void onAnimationEnd(Animator animation)
-                    {
-                        view.setVisibility(View.VISIBLE);
-                    }
-                });
-                animator.start();
+//                ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+//                animator.setDuration(0);
+//                animator.addListener(new AnimatorListenerAdapter()
+//                {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation)
+//                    {
+//                        webView.setVisibility(View.VISIBLE);
+//                    }
+//                });
+//                animator.start();
             }
 
         });
         webView.loadUrl(mRequestUrl);
-        setContentView(webView);
-
-
     }
 
     @Override
