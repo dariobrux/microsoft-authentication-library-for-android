@@ -148,7 +148,7 @@ public final class AuthenticationActivity extends Activity
         {
             public void onProgressChanged(WebView view, int progress)
             {
-                if (progress == 100)
+                if (!view.getUrl().startsWith("msal") && progress == 100)
                 {
                     webView.setVisibility(View.VISIBLE);
                 }
