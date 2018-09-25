@@ -16,12 +16,10 @@ static def getTimestamp() {
 }
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
-
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 27
+        minSdkVersion 21
+        targetSdkVersion 28
 //        versionCode 0
 //        versionName '0.1.2'
         versionCode getTimestamp()
@@ -101,7 +99,7 @@ task javadoc(type: Javadoc) {
     classpath += configurations.compile
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 
-    options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PUBLIC
+    options.memberLevel = JavadocMemberLevel.PUBLIC
     options.addStringOption('Xdoclint:none', '-quiet')
 
     exclude '**/BuildConfig.Java'
@@ -125,18 +123,18 @@ task sourcesJar(type: Jar) {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation "com.android.support:appcompat-v7:$support_version"
+    implementation 'com.google.code.gson:gson:2.8.5'
 
     // test dependencies
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.18.3'
+    testImplementation 'org.mockito:mockito-core:2.21.0'
 
     // instrumentation test dependencies
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     // Set this dependency to use JUnit 4 rules
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'org.mockito:mockito-core:2.18.3'
+    androidTestImplementation 'org.mockito:mockito-core:2.21.0'
     androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
     androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
