@@ -70,7 +70,6 @@ public final class AuthenticationActivity extends Activity
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setVisibility(View.INVISIBLE);
 
-        // If activity is killed by the os, savedInstance will be the saved bundle.
         if (savedInstanceState != null)
         {
             Logger.verbose(TAG, null, "AuthenticationActivity is re-created after killed by the os.");
@@ -94,14 +93,6 @@ public final class AuthenticationActivity extends Activity
             return;
         }
 
-//        // We'll use custom tab if the chrome installed on the device comes with custom tab support(on 45 and above it
-//        // does). If the chrome package doesn't contain the support, we'll use chrome to launch the UI.
-//        if (MsalUtils.getChromePackage(this.getApplicationContext()) == null) {
-//            Logger.info(TAG, null, "Chrome is not installed on the device, cannot continue with auth.");
-//            sendError(MsalClientException.CHROME_NOT_INSTALLED, "Chrome is not installed on the device, cannot proceed with auth");
-//            return;
-//        }
-
         mTelemetryRequestId = data.getStringExtra(Constants.TELEMETRY_REQUEST_ID);
         mUiEventBuilder = new UiEvent.Builder();
         Telemetry.getInstance().startEvent(mTelemetryRequestId, mUiEventBuilder.getEventName());
@@ -123,9 +114,8 @@ public final class AuthenticationActivity extends Activity
     }
 
     @Override
-    protected void onResume()
-    {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         mRequestUrl = this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
 
@@ -179,17 +169,6 @@ public final class AuthenticationActivity extends Activity
             public void onPageFinished(final WebView view, String url)
             {
                 super.onPageFinished(view, url);
-//                ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-//                animator.setDuration(0);
-//                animator.addListener(new AnimatorListenerAdapter()
-//                {
-//                    @Override
-//                    public void onAnimationEnd(Animator animation)
-//                    {
-//                        webView.setVisibility(View.VISIBLE);
-//                    }
-//                });
-//                animator.start();
             }
 
         });
