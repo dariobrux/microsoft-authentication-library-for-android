@@ -6,7 +6,7 @@ apply plugin: 'pmd'
 apply plugin: 'com.github.dcendents.android-maven'
 
 def packageName = 'com.pillohealth'
-def libVersion = "1.0.3"
+def libVersion = "1.0.4"
 
 static def getTimestamp() {
     def currentDate = new Date()

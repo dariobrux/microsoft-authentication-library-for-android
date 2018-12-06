@@ -50,12 +50,10 @@ public final class AuthenticationActivity extends Activity
 {
     private WebView webView;
 
-    private static final String TAG = AuthenticationActivity.class.getSimpleName(); //NOPMD
-    private static final long CUSTOMTABS_MAX_CONNECTION_TIMEOUT = 1L;
+    private static final String TAG = AuthenticationActivity.class.getSimpleName();
 
     private String mRequestUrl;
     private int mRequestId;
-    private boolean mRestarted;
     private UiEvent.Builder mUiEventBuilder;
     private String mTelemetryRequestId;
 
@@ -76,7 +74,6 @@ public final class AuthenticationActivity extends Activity
         if (savedInstanceState != null)
         {
             Logger.verbose(TAG, null, "AuthenticationActivity is re-created after killed by the os.");
-            mRestarted = true;
             mTelemetryRequestId = savedInstanceState.getString(Constants.TELEMETRY_REQUEST_ID);
             mUiEventBuilder = new UiEvent.Builder();
             return;
@@ -85,7 +82,7 @@ public final class AuthenticationActivity extends Activity
         final Intent data = getIntent();
         if (data == null)
         {
-            sendError(MsalClientException.UNRESOLVABLE_INTENT, "Received null data intent from caller");
+            sendError("Received null data intent from caller");
             return;
         }
 
@@ -93,7 +90,7 @@ public final class AuthenticationActivity extends Activity
         mRequestId = data.getIntExtra(Constants.REQUEST_ID, 0);
         if (MsalUtils.isEmpty(mRequestUrl))
         {
-            sendError(MsalClientException.UNRESOLVABLE_INTENT, "Request url is not set on the intent");
+            sendError("Request url is not set on the intent");
             return;
         }
 
@@ -112,8 +109,6 @@ public final class AuthenticationActivity extends Activity
 
     /**
      * OnNewIntent will be called before onResume.
-     *
-     * @param intent
      */
     @Override
     protected void onNewIntent(Intent intent)
@@ -131,14 +126,6 @@ public final class AuthenticationActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-
-        if (mRestarted)
-        {
-            cancelRequest();
-            return;
-        }
-
-        mRestarted = true;
 
         mRequestUrl = this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
 
@@ -219,16 +206,6 @@ public final class AuthenticationActivity extends Activity
     }
 
     /**
-     * Cancels the auth request.
-     */
-    void cancelRequest()
-    {
-        Logger.verbose(TAG, null, "Cancel the authentication request.");
-        mUiEventBuilder.setUserDidCancel();
-        returnToCaller(Constants.UIResponse.CANCEL, new Intent());
-    }
-
-    /**
      * Return the error back to caller.
      *
      * @param resultCode The result code to return back.
@@ -251,15 +228,14 @@ public final class AuthenticationActivity extends Activity
     /**
      * Send error back to caller with the error description.
      *
-     * @param errorCode        The error code to send back.
      * @param errorDescription The error description to send back.
      */
-    private void sendError(final String errorCode, final String errorDescription)
+    private void sendError(final String errorDescription)
     {
-        Logger.info(TAG, null, "Sending error back to the caller, errorCode: " + errorCode + "; errorDescription"
+        Logger.info(TAG, null, "Sending error back to the caller, errorCode: " + MsalClientException.UNRESOLVABLE_INTENT + "; errorDescription"
                 + errorDescription);
         final Intent errorIntent = new Intent();
-        errorIntent.putExtra(Constants.UIResponse.ERROR_CODE, errorCode);
+        errorIntent.putExtra(Constants.UIResponse.ERROR_CODE, MsalClientException.UNRESOLVABLE_INTENT);
         errorIntent.putExtra(Constants.UIResponse.ERROR_DESCRIPTION, errorDescription);
         returnToCaller(Constants.UIResponse.AUTH_CODE_ERROR, errorIntent);
     }
