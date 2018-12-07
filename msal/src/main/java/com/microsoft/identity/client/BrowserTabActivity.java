@@ -62,7 +62,6 @@ public final class BrowserTabActivity extends Activity {
         intent.putExtra(Constants.CUSTOM_TAB_REDIRECT, getIntent().getDataString());
         Logger.verbosePII(TAG, null, getIntent().getDataString());
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
 }

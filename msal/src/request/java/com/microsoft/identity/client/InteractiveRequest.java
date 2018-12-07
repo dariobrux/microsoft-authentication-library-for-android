@@ -101,7 +101,7 @@ final class InteractiveRequest extends BaseRequest {
         intentToLaunch.putExtra(Constants.REQUEST_ID, mRequestId);
         intentToLaunch.putExtra(
                 Constants.TELEMETRY_REQUEST_ID,
-                mAuthRequestParameters.getRequestContext().getTelemetryRequestId().toString()
+                mAuthRequestParameters.getRequestContext().getTelemetryRequestId()
         );
 
         if (!resolveIntent(intentToLaunch)) {
@@ -110,7 +110,7 @@ final class InteractiveRequest extends BaseRequest {
 
         throwIfNetworkNotAvailable();
 
-        mActivityWrapper.startActivityForResult(intentToLaunch, BROWSER_FLOW);
+        mActivityWrapper.startActivityForResult(intentToLaunch);
         // lock the thread until onActivityResult release the lock.
         try {
             if (sResultLock.getCount() == 0) {
@@ -382,7 +382,6 @@ final class InteractiveRequest extends BaseRequest {
          * Creates a new instance of {@link PKCEChallenge}.
          *
          * @return the newly created Challenge
-         * @throws MsalException if the Challenge could not be created
          */
         static PKCEChallenge newPKCEChallenge() throws MsalClientException {
             // Generate the code_verifier as a high-entropy cryptographic random String
@@ -424,15 +423,15 @@ final class InteractiveRequest extends BaseRequest {
         private WeakReference<Activity> mReferencedActivity;
 
         ActivityWrapper(final Activity activity) {
-            mReferencedActivity = new WeakReference<Activity>(activity);
+            mReferencedActivity = new WeakReference<>(activity);
         }
 
-        void startActivityForResult(final Intent intent, int requestCode) throws MsalClientException {
+        void startActivityForResult(final Intent intent) throws MsalClientException {
             if (mReferencedActivity.get() == null) {
                 throw new MsalClientException(MsalClientException.UNRESOLVABLE_INTENT, "The referenced object is already being garbage collected.");
             }
 
-            mReferencedActivity.get().startActivityForResult(intent, requestCode);
+            mReferencedActivity.get().startActivityForResult(intent, InteractiveRequest.BROWSER_FLOW);
         }
     }
 }
