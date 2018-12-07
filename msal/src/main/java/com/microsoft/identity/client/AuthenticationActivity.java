@@ -96,26 +96,6 @@ public final class AuthenticationActivity extends Activity
         mTelemetryRequestId = data.getStringExtra(Constants.TELEMETRY_REQUEST_ID);
         mUiEventBuilder = new UiEvent.Builder();
         Telemetry.getInstance().startEvent(mTelemetryRequestId, mUiEventBuilder.getEventName());
-    }
-
-    /**
-     * OnNewIntent will be called before onResume.
-     */
-    @Override
-    protected void onNewIntent(Intent intent)
-    {
-        super.onNewIntent(intent);
-        Logger.info(TAG, null, "onNewIntent is called, received redirect from system webview.");
-
-        final String url = intent.getStringExtra(Constants.CUSTOM_TAB_REDIRECT);
-        final Intent resultIntent = new Intent();
-        resultIntent.putExtra(Constants.AUTHORIZATION_FINAL_URL, url);
-        returnToCaller(Constants.UIResponse.AUTH_CODE_COMPLETE, resultIntent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         mRequestUrl = this.getIntent().getStringExtra(Constants.REQUEST_URL_KEY);
 
@@ -173,6 +153,21 @@ public final class AuthenticationActivity extends Activity
 
         });
         webView.loadUrl(mRequestUrl);
+    }
+
+    /**
+     * OnNewIntent will be called before onResume.
+     */
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        Logger.info(TAG, null, "onNewIntent is called, received redirect from system webview.");
+
+        final String url = intent.getStringExtra(Constants.CUSTOM_TAB_REDIRECT);
+        final Intent resultIntent = new Intent();
+        resultIntent.putExtra(Constants.AUTHORIZATION_FINAL_URL, url);
+        returnToCaller(Constants.UIResponse.AUTH_CODE_COMPLETE, resultIntent);
     }
 
     @Override
